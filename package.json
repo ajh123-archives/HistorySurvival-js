@@ -2,9 +2,8 @@
   "name": "history-survival",
   "version": "0.0.5",
   "description": "A voxel game engine with multiplayer and planets",
-  "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "build": "rollup -c --bundleConfigAsCjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,5 +22,14 @@
   "bugs": {
     "url": "https://github.com/ajh123-development/HistorySurvival/issues"
   },
-  "homepage": "https://github.com/ajh123-development/HistorySurvival#readme"
+  "homepage": "https://github.com/ajh123-development/HistorySurvival#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "softxels": "^0.0.57"
+  },
+  "devDependencies": {
+    "@web/rollup-plugin-html": "^1.11.0",
+    "rollup": "^3.19.1",
+    "rollup-plugin-node-resolve": "^5.2.0"
+  }
 }
