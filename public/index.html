@@ -11,9 +11,14 @@
 		<div id="app"></div>
 
 		<div id="info">
-			History Survival 0.0.5 - <span id="fps">···</span><br />
+			<p>History Survival 0.0.5</p>
 		</div>
 
-		<script type="module" src="../src/index.js"></script>
+		<div id="chatbox" style="visibility: hidden">
+			<span id="chatbox_text"></span>
+		</div>
+		<input id="chatbox_entry" type="text" maxlength="100" spellcheck="false" onkeypress="onChatEnter( this, event )" style="visibility: hidden" />
+
+		<script type="module" src="../src/client/index.js"></script>
 	</body>
 </html>

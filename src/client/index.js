@@ -7,13 +7,14 @@ import {
 	PMREMGenerator,
 } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
-import Player from './core/player.js';
-import Renderer from './core/renderer.js';
+import ClientPlayer from './player.js';
+import Renderer from './renderer.js';
+import io from 'socket.io/client-dist/socket.io'
 
 
 Renderer.patchFog();
 const renderer = new Renderer({
-	fps: document.getElementById('fps'),
+	info_entry: document.getElementById('info'),
 	renderer: document.getElementById('app'),
 });
 
@@ -30,10 +31,12 @@ class Main extends Scene {
 			envMapIntensity: 0.1,
 		});
 
-
-		this.player = new Player({
+		this.socket = io();
+		this.player = new ClientPlayer({
 			camera: renderer.camera,
 			renderer: renderer.dom.renderer,
+			dom: {info_entry: document.getElementById('info'),},
+			socket: this.socket,
 		});
 		this.player.position.setScalar(chunkSize * 0.5);
 		this.player.targetPosition.copy(this.player.position);
@@ -63,7 +66,6 @@ class Main extends Scene {
 		const {player, world } = this;
 		player.onAnimationTick(animation);
 		world.updateChunks(player.position);
-		console.log("Test")
 	};
 
 	onResize() {}

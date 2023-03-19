@@ -17,6 +17,8 @@ class Renderer {
             lastTick: this.clock.oldTime / 1000,
         };
         this.dom = dom;
+        this.fpsDom = document.createElement('p');
+        this.dom.info_entry.appendChild(this.fpsDom);
 
         this.camera = new PerspectiveCamera(70, 1, 0.1, 1000);
         this.renderer = new WebGLRenderer({
@@ -43,7 +45,7 @@ class Renderer {
         const {
             camera,
             clock,
-            dom,
+            fpsDom,
             fps,
             listener,
             renderer,
@@ -65,7 +67,7 @@ class Renderer {
         fps.count += 1;
         if (animation.time >= fps.lastTick + 1) {
             renderer.fps = Math.round(fps.count / (animation.time - fps.lastTick));
-            dom.fps.innerText = `${renderer.fps}fps`;
+            fpsDom.innerText = `${renderer.fps}fps`;
             fps.lastTick = animation.time;
             fps.count = 0;
         }
