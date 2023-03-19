@@ -1,0 +1,27 @@
+{
+  "name": "history-survival",
+  "version": "0.0.5",
+  "description": "A voxel game engine with multiplayer and planets",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ajh123-development/HistorySurvival.git"
+  },
+  "keywords": [
+    "voxel",
+    "game",
+    "planets",
+    "cities",
+    "multiplayer"
+  ],
+  "author": "ajh123",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ajh123-development/HistorySurvival/issues"
+  },
+  "homepage": "https://github.com/ajh123-development/HistorySurvival#readme"
+}
