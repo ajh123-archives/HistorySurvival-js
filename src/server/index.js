@@ -1,13 +1,17 @@
-import Player from '../core/player.js';
-
 import express from 'express';
 import path from 'path'
 import http from 'http';
 import { fileURLToPath } from 'url';
 import { Server } from "socket.io";
+
+import Player from '../core/player.js';
+import Planet from '../core/world.js'
+
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+const planet = new Planet();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

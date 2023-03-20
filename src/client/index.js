@@ -1,15 +1,15 @@
-import World, { WorldGen } from 'softxels';
 import { 
 	Scene, 
-	MeshStandardMaterial, 
 	SpotLight, 
 	Color,
 	PMREMGenerator,
 } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
-import ClientPlayer from './player.js';
 import Renderer from './renderer.js';
 import io from 'socket.io/client-dist/socket.io'
+
+import ClientPlayer from './player.js';
+import ClientPlanet from './world.js'
 
 
 Renderer.patchFog();
@@ -22,14 +22,6 @@ const renderer = new Renderer({
 class Main extends Scene {
 	constructor() {
 		super();
-
-		const chunkSize = 32;
-		const chunkMaterial = new MeshStandardMaterial({
-			metalness: 0.2,
-			roughness: 0.8,
-			vertexColors: true,
-			envMapIntensity: 0.1,
-		});
 
 		this.socket = io();
 		this.player = new ClientPlayer({
@@ -54,10 +46,8 @@ class Main extends Scene {
 		this.player.camera.add(light);
 
 
-		this.world = new World({
-			chunkMaterial,
-			chunkSize,
-			worldgen: WorldGen({generator: "terrain"})
+		this.world = new ClientPlanet({
+			socket: this.socket,
 		});
 		this.add(this.world);
 	}
@@ -65,7 +55,7 @@ class Main extends Scene {
 	onAnimationTick(animation) {
 		const {player, world } = this;
 		player.onAnimationTick(animation);
-		world.updateChunks(player.position);
+		world.world.updateChunks(player.position);
 	};
 
 	onResize() {}
