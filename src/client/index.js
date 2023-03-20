@@ -6,10 +6,10 @@ import {
 } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import Renderer from './renderer.js';
-import io from 'socket.io/client-dist/socket.io'
+import io from '../../node_modules/socket.io/client-dist/socket.io.js'
 
 import ClientPlayer from './player.js';
-import ClientPlanet from './world.js'
+import ClientPlanet, { chunkSize } from './world.js'
 
 
 Renderer.patchFog();

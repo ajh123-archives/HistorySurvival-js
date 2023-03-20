@@ -5,9 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "rollup -c --bundleConfigAsCjs",
-    "build:serve": "npm run build && npm run serve",
-    "serve": "node ./src/server/index.js",
-    "watch": "nodemon --exec \"npm run build && node ./src/server/index.js\" -e js --ignore ./dist/",
+    "watch": "nodemon --exec \"npm run build && npm run start\" -e js --ignore ./dist/ --ignore ./dist_server/",
+    "start": "node ./dist_server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -33,10 +32,11 @@
     "softxels": "^0.0.57"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
     "@web/rollup-plugin-html": "^1.11.0",
     "nodemon": "^2.0.21",
-    "rollup": "^3.19.1",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-node-resolve": "^5.2.0"
+    "rollup": "^3.19.1"
   }
 }

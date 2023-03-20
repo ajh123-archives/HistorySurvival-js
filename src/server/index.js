@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path'
 import http from 'http';
 import { fileURLToPath } from 'url';
-import { Server } from "socket.io";
+import { Server } from 'socket.io';
 
 import Player from '../core/player.js';
 import Planet from '../core/world.js'
@@ -17,11 +17,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 
 app.get('/', (req, res) => {
-	res.sendFile(path.join(__dirname, '..', '..', 'dist', 'index.html'),);
+	res.sendFile(path.join(__dirname, '..', 'dist', 'index.html'),);
 });
 
 app.get('/*', (req, res) => {
-	res.sendFile(path.join(__dirname, '..', '..', 'dist', req.path),);
+	res.sendFile(path.join(__dirname, '..', 'dist', req.path),);
 });
 
 io.on('connection', (socket) => {
