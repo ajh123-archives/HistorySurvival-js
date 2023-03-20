@@ -13,7 +13,7 @@ class ClientPlayer extends Player {
 		dom,
 		socket,
 	}) {
-		super(socket);
+		super({socket});
 
 		this.aux = {
 			center: new Vector2(),
@@ -69,7 +69,6 @@ class ClientPlayer extends Player {
 				right,
 				worldUp,
 			},
-			socket,
 			posDom,
 			buttons,
 			buttonState,

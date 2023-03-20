@@ -2,11 +2,14 @@ import Player from '../core/player.js';
 
 import express from 'express';
 import path from 'path'
-const app = express();
 import http from 'http';
-const server = http.createServer(app);
+import { fileURLToPath } from 'url';
 import { Server } from "socket.io";
+const app = express();
+const server = http.createServer(app);
 const io = new Server(server);
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 
 app.get('/', (req, res) => {
@@ -19,7 +22,7 @@ app.get('/*', (req, res) => {
 
 io.on('connection', (socket) => {
 	console.log('a user connected');
-	new Player(socket);
+	new Player({socket});
 	socket.on('disconnect', () => {
 		console.log('user disconnected');
 	});
