@@ -9,7 +9,8 @@ import Renderer from './renderer.js';
 import io from '../../node_modules/socket.io/client-dist/socket.io.js'
 
 import ClientPlayer from './player.js';
-import ClientPlanet, { chunkSize } from './world.js'
+import ClientPlanet from './world.js'
+import { chunkSize } from '../core/world.js'
 
 
 Renderer.patchFog();
