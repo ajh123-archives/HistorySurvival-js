@@ -1,28 +1,33 @@
-import World, { WorldGen } from 'softxels';
 import {
 	Group,
-	MeshStandardMaterial,
+	Vector3
 } from 'three';
 
 
-export const chunkSize = 32;
-const chunkMaterial = new MeshStandardMaterial({
-	metalness: 0.2,
-	roughness: 0.8,
-	vertexColors: true,
-	envMapIntensity: 0.1,
-});
-
 class Planet extends Group {
-	constructor() {
+	constructor({size}) {
 		super();
+		this.size = size;
+		this.terrain = [];
+	}
 
-		this.world = new World({
-			chunkMaterial,
-			chunkSize,
-			worldgen: WorldGen({generator: "terrain"})
-		});
-		this.add(this.world);
+	build() {
+		let center = this.getCenter();
+		let radius = 2 * this.size/6;
+		for(let x = 0; x < this.size; x++) {
+			this.terrain[x] = [];
+			for(let y = 0; y < this.size; y++) {
+				this.terrain[x][y]=[];
+				for(let z = 0; z < this.size; z++) {
+					let point = new Vector3(x, y ,z);
+					this.terrain[x][y][z] = point.distanceTo(center) < radius ? 1 : 0;
+				}	
+			}				
+		}
+	}
+
+	getCenter() {
+		return new Vector3(this.size / 2, this.size / 2, this.size / 2);
 	}
 }
 

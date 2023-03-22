@@ -5,13 +5,14 @@ import {
 	PMREMGenerator,
 } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
-import Renderer from './renderer.js';
 import io from '../../node_modules/socket.io/client-dist/socket.io.js'
 
-import ClientPlayer from './player.js';
-import ClientPlanet from './world.js'
-import { chunkSize } from '../core/world.js'
+import Renderer from './renderer';
+import ClientPlayer from './player';
+import ClientPlanet from './world/world'
 
+
+const chunkSize = 32;
 
 Renderer.patchFog();
 const renderer = new Renderer({
@@ -31,7 +32,7 @@ class Main extends Scene {
 			dom: {info_entry: document.getElementById('info'),},
 			socket: this.socket,
 		});
-		this.player.position.setScalar(chunkSize * 0.5);
+
 		this.player.targetPosition.copy(this.player.position);
 		this.player.camera.rotation.set(0, 0, 0, 'YXZ');
 		this.player.targetRotation.copy(this.player.camera.rotation);
@@ -50,13 +51,15 @@ class Main extends Scene {
 		this.world = new ClientPlanet({
 			socket: this.socket,
 		});
+		this.world.build();
+		this.world.buildMesh();
 		this.add(this.world);
 	}
 
 	onAnimationTick(animation) {
 		const {player, world } = this;
 		player.onAnimationTick(animation);
-		world.world.updateChunks(player.position);
+		// world.world.updateChunks(player.position);
 	};
 
 	onResize() {}

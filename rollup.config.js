@@ -4,7 +4,6 @@ import { rollupPluginHTML as html } from '@web/rollup-plugin-html';
 import path from 'path';
 import json from '@rollup/plugin-json'
 
-
 const outputPath = path.resolve(__dirname, 'dist');
 const outputPathServer = path.resolve(__dirname, 'dist_server');
 

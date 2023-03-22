@@ -5,7 +5,7 @@ import {
 	Vector3,
 } from 'three';
 
-import Player from '../core/player.js';
+import Player from '../core/player';
 
 
 class ClientPlayer extends Player {

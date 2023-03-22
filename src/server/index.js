@@ -4,14 +4,14 @@ import http from 'http';
 import { fileURLToPath } from 'url';
 import { Server } from 'socket.io';
 
-import Player from '../core/player.js';
-import Planet from '../core/world.js'
+import Player from '../core/player';
+import Planet from '../core/world'
 
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
-const planet = new Planet();
+const planet = new Planet({size: 10});
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
