@@ -36,9 +36,8 @@ class ClientPlanet extends Planet {
 		for(let x = 0; x < this.size - 1; x++) {
 			for(let y = 0; y < this.size - 1; y++) {
 				for(let z = 0; z < this.size - 1; z++) {
-					let marchingIdx = this.mesher.getCubeIndexAt(this.terrain, x, y, z); 
-					let pos = new Vector3(x - center.x, y - center.y, z - center.z)
-					this.mesher.buildVertices(marchingIdx, pos, this.size);
+					let marchingIdx = this.mesher.getCubeIndexAt(this.terrain, x, y, z);
+					this.mesher.buildVertices(marchingIdx, center, this.size);
 				}	
 			}				
 		}
