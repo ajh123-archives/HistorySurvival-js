@@ -35,7 +35,6 @@ class ClientPlayer extends Player {
 		this.pointer = new Vector2(0, 0);
 		this.raycaster = new Raycaster();
 		this.speed = 8;
-		this.targetPosition = this.position.clone();
 		this.targetRotation = camera.rotation.clone();
 		this.add(camera);
 

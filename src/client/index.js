@@ -7,10 +7,10 @@ import {
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import io from '../../node_modules/socket.io/client-dist/socket.io.js'
 
-import Renderer from './renderer';
+import Renderer from './gui/renderer';
+import DebugGui from './gui/debug'
 import ClientPlayer from './player';
 import ClientPlanet from './world/world'
-import DebugGui from './debug'
 
 
 var debugGui = new DebugGui();
@@ -46,7 +46,7 @@ class Main extends Scene {
 
 
 		this.background = new Color(0x0A1A2A);
-		const light = new SpotLight(0xFFFFFF, 2, 32, Math.PI / 3, 1);
+		const light = new SpotLight(0xFFFFFF, 10, 32, Math.PI / 3, 1);
 		light.target.position.set(0, 0, -1);
 		light.add(light.target);
 		this.player.camera.add(light);
@@ -54,10 +54,8 @@ class Main extends Scene {
 
 		this.world = new ClientPlanet({
 			socket: this.socket,
+			scene: this,
 		});
-		this.world.build();
-		this.world.buildMesh();
-		this.add(this.world);
 	}
 
 	onAnimationTick(animation) {

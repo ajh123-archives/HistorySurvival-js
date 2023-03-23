@@ -14,10 +14,17 @@ import TerrainMessher from './terrain_mesher';
 class ClientPlanet extends Planet {
 	constructor({
 		socket,
+		scene,
 	}) {
-		super({size: 20});
+		super({size: 0});
 		this.socket = socket;
 		this.mesher = new TerrainMessher();
+		socket.emit('loadTerrain');
+		socket.on('loadTerrain', (msg) => {
+			this.deserialise(msg[0]);
+			this.buildMesh();
+			scene.add(this);
+		});
 	}
 
 	buildMesh() {
@@ -28,9 +35,9 @@ class ClientPlanet extends Planet {
 		for(let x = 0; x < this.size - 1; x++) {
 			for(let y = 0; y < this.size - 1; y++) {
 				for(let z = 0; z < this.size - 1; z++) {
-					let marchingIdx = this.mesher.extractMarchingIdFromFieldAt(this.terrain, x, y, z); 
+					let marchingIdx = this.mesher.getCubeIndexAt(this.terrain, x, y, z); 
 					let pos = new Vector3(x - center.x, y - center.y, z - center.z)
-					this.mesher.getMarchinCubeVertex(marchingIdx, pos);
+					this.mesher.buildVertices(marchingIdx, pos);
 				}	
 			}				
 		}

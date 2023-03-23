@@ -10,24 +10,24 @@ class TerrainMessher {
 		this.vertices = [];
 	}
 
-	extractMarchingIdFromFieldAt(field, x, y, z) {
+	getCubeIndexAt(terrain, x, y, z) {
 		let data = [];
 
 		for(let i = 0; i < 8;i++) {
 			let offset = cornerOffsets[i];
-			data.push(field[x + offset.x][y + offset.y][z + offset.z]);
+			data.push(terrain[x + offset.x][y + offset.y][z + offset.z]);
 		}
-		return this.dataToMarchingCubeIndex(data);
+		return this.getCubeIndex(data);
 	}
 
-	dataToMarchingCubeIndex(d) {
+	getCubeIndex(d) {
 		if(Array.isArray(d) == false) return 0;
 		if(d.length !== 8) return 0;
 
 		return d[0] + 2 * d[1] + 4 * d[2] + 8 * d[3] + 16 * d[4] + 32 * d[5] + 64 * d[6] + 128 * d[7];
 	}
 
-	getMarchinCubeVertex(id, pos) {	
+	buildVertices(id, pos) {	
 		for(var face = 0; face < 5; face++) {
 			var addedFace = false;
 			for(var tri = 0; tri < 3; tri++) {

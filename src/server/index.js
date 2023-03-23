@@ -11,7 +11,8 @@ import Planet from '../core/world'
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
-const planet = new Planet({size: 10});
+const planet = new Planet({size: 100});
+planet.generate();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -26,7 +27,12 @@ app.get('/*', (req, res) => {
 
 io.on('connection', (socket) => {
 	console.log('a user connected');
-	new Player({socket});
+	var player = new Player({socket});
+	player.position.set(0, (planet.size/2)-((planet.size/4)-10), 0);
+	player.sendPosition();
+	socket.on('loadTerrain', () => {
+		socket.emit('loadTerrain', [planet.serialise()]);
+	});
 	socket.on('disconnect', () => {
 		console.log('user disconnected');
 	});

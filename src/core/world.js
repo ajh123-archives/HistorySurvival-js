@@ -11,7 +11,7 @@ class Planet extends Group {
 		this.terrain = [];
 	}
 
-	build() {
+	generate() {
 		let center = this.getCenter();
 		let radius = 2 * this.size/6;
 		for(let x = 0; x < this.size; x++) {
@@ -22,12 +22,27 @@ class Planet extends Group {
 					let point = new Vector3(x, y ,z);
 					this.terrain[x][y][z] = point.distanceTo(center) < radius ? 1 : 0;
 				}	
-			}				
+			}
 		}
 	}
 
 	getCenter() {
 		return new Vector3(this.size / 2, this.size / 2, this.size / 2);
+	}
+
+	serialise() {
+		return {
+			position: {x: this.position.x, y: this.position.y, z: this.position.z},
+			size: this.size,
+			terrain: this.terrain,
+		}
+	}
+
+	deserialise(planet) {
+		console.log(planet);
+		this.position.set(planet.position.x, planet.position.y, planet.position.z);
+		this.size = planet.size;
+		this.terrain = planet.terrain;
 	}
 }
 
