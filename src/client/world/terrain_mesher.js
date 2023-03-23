@@ -8,6 +8,7 @@ class TerrainMessher {
 	constructor() {
 		this.colors = [];
 		this.vertices = [];
+		this.indecies = [];
 	}
 
 	getCubeIndexAt(terrain, x, y, z) {
@@ -27,7 +28,11 @@ class TerrainMessher {
 		return d[0] + 2 * d[1] + 4 * d[2] + 8 * d[3] + 16 * d[4] + 32 * d[5] + 64 * d[6] + 128 * d[7];
 	}
 
-	buildVertices(id, pos) {	
+	sampleValue(pos, radius){
+		return pos.distanceTo(new Vector3(0, 0, 0)) - radius;
+	}
+
+	buildVertices(id, pos, radius) {	
 		for(var face = 0; face < 5; face++) {
 			var addedFace = false;
 			for(var tri = 0; tri < 3; tri++) {
@@ -35,14 +40,30 @@ class TerrainMessher {
 				if (edgeCase == -1) return;
 				addedFace = true;
 
-				var vertStart = edgeVertexOffsets[edgeCase][0];
-				var vertEnd   = edgeVertexOffsets[edgeCase][1];
+				var vert1 = edgeVertexOffsets[edgeCase][0];
+				var vert2 = edgeVertexOffsets[edgeCase][1];
+
+
+                // interpolate along the edge
+                var s1 = this.sampleValue(edgeVertexOffsets[edgeCase][0], radius);
+                var s2 = this.sampleValue(edgeVertexOffsets[edgeCase][1], radius);
+                var dif = s1 - s2;
+                if (dif == 0.0) {
+                    dif = 0.5;
+				} else {
+                    dif = s1 / dif;
+				}
+                // Lerp
+				var stage1 = vert2.clone().sub(vert1.clone());
+				var stage2 = stage1.multiplyScalar(dif);
+                var vertPosInterpolated = vert1.clone().add(stage2);
 
 				this.vertices.push(
-					(vertStart.x+vertEnd.x)/2+pos.x,
-					(vertStart.y+vertEnd.y)/2+pos.y,
-					(vertStart.z+vertEnd.z)/2+pos.z,
+					(vertPosInterpolated.x)+pos.x,
+					(vertPosInterpolated.y)+pos.y,
+					(vertPosInterpolated.z)+pos.z,
 				);
+				this.indecies.push(this.vertices.length - 1);
 
 				var color = new Color(0x0000AA);
 				this.colors.push(color.r, color.g, color.b);

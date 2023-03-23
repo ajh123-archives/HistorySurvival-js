@@ -46,7 +46,7 @@ class Main extends Scene {
 
 
 		this.background = new Color(0x0A1A2A);
-		const light = new SpotLight(0xFFFFFF, 10, 32, Math.PI / 3, 1);
+		const light = new SpotLight(0xFFFFFF, 5, 200, Math.PI / 3, 1);
 		light.target.position.set(0, 0, -1);
 		light.add(light.target);
 		this.player.camera.add(light);

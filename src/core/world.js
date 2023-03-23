@@ -27,7 +27,7 @@ class Planet extends Group {
 	}
 
 	getCenter() {
-		return new Vector3(this.size / 2, this.size / 2, this.size / 2);
+		return new Vector3(this.size / 2, this.size / 2, this.size / 2).add(this.position);
 	}
 
 	serialise() {
@@ -39,7 +39,6 @@ class Planet extends Group {
 	}
 
 	deserialise(planet) {
-		console.log(planet);
 		this.position.set(planet.position.x, planet.position.y, planet.position.z);
 		this.size = planet.size;
 		this.terrain = planet.terrain;
