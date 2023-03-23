@@ -11,8 +11,8 @@ import Player from '../core/player';
 class ClientPlayer extends Player {
 	constructor({
 		camera,
-		renderer,
-		dom,
+		viewport,
+		debugGui,
 		socket,
 	}) {
 		super({socket});
@@ -56,10 +56,14 @@ class ClientPlayer extends Player {
 		document.addEventListener('mouseup', this.onMouseUp);
 		document.addEventListener('wheel', this.onMouseWheel, false);
 		document.addEventListener('pointerlockchange', this.onPointerLock);
-		renderer.addEventListener('mousedown', this.requestPointerLock);
+		viewport.addEventListener('mousedown', this.requestPointerLock);
 
-		this.posDom = document.createElement('p');
-		dom.info_entry.appendChild(this.posDom);
+        this.debugGui = debugGui;
+        this.folder = this.debugGui.datGUI.addFolder('Player');
+        this.info = {x: 0, y: 0, z: 0};
+        this.folder.add(this.info, 'x');
+		this.folder.add(this.info, 'y');
+		this.folder.add(this.info, 'z');
 	}
 
 	onAnimationTick(animation) {
@@ -71,7 +75,8 @@ class ClientPlayer extends Player {
 				right,
 				worldUp,
 			},
-			posDom,
+            info,
+            folder,
 			buttons,
 			buttonState,
 			camera,
@@ -84,40 +89,39 @@ class ClientPlayer extends Player {
 			targetRotation,
 			raycaster,
 		} = this;
-		if (!isLocked) {
-			return;
-		}
-		if (pointer.x !== 0 || pointer.y !== 0) {
-			targetRotation.y += pointer.x;
-			targetRotation.x += pointer.y;
-			targetRotation.x = Math.min(Math.max(targetRotation.x, Math.PI * -0.5), Math.PI * 0.5);
-			pointer.set(0, 0);
-		}
-		camera.rotation.y = MathUtils.damp(camera.rotation.y, targetRotation.y, 20, animation.delta);
-		camera.rotation.x = MathUtils.damp(camera.rotation.x, targetRotation.x, 20, animation.delta);
-		['primary', 'secondary', 'tertiary'].forEach((button) => {
-			const state = buttonState[button];
-			buttons[`${button}Down`] = state && buttons[button] !== state;
-			buttons[`${button}Up`] = !state && buttons[button] !== state;
-			buttons[button] = state;
-		});
-		if (
-			keyboard.x !== 0
-			|| keyboard.y !== 0
-			|| keyboard.z !== 0
-		) {
-			camera.getWorldDirection(forward);
-			right.crossVectors(worldUp, forward);
-			targetPosition.addScaledVector(
-				direction
-					.set(0, 0, 0)
-					.addScaledVector(right, -keyboard.x)
-					.addScaledVector(worldUp, keyboard.y)
-					.addScaledVector(forward, keyboard.z)
-					.normalize(),
-				animation.delta * speed
-			);
-			this.updateMatrixWorld();
+		if (isLocked) {
+			if (pointer.x !== 0 || pointer.y !== 0) {
+				targetRotation.y += pointer.x;
+				targetRotation.x += pointer.y;
+				targetRotation.x = Math.min(Math.max(targetRotation.x, Math.PI * -0.5), Math.PI * 0.5);
+				pointer.set(0, 0);
+			}
+			camera.rotation.y = MathUtils.damp(camera.rotation.y, targetRotation.y, 20, animation.delta);
+			camera.rotation.x = MathUtils.damp(camera.rotation.x, targetRotation.x, 20, animation.delta);
+			['primary', 'secondary', 'tertiary'].forEach((button) => {
+				const state = buttonState[button];
+				buttons[`${button}Down`] = state && buttons[button] !== state;
+				buttons[`${button}Up`] = !state && buttons[button] !== state;
+				buttons[button] = state;
+			});
+			if (
+				keyboard.x !== 0
+				|| keyboard.y !== 0
+				|| keyboard.z !== 0
+			) {
+				camera.getWorldDirection(forward);
+				right.crossVectors(worldUp, forward);
+				targetPosition.addScaledVector(
+					direction
+						.set(0, 0, 0)
+						.addScaledVector(right, -keyboard.x)
+						.addScaledVector(worldUp, keyboard.y)
+						.addScaledVector(forward, keyboard.z)
+						.normalize(),
+					animation.delta * speed
+				);
+				this.updateMatrixWorld();
+			}
 		}
 		position.x = MathUtils.damp(position.x, targetPosition.x, 10, animation.delta);
 		position.y = MathUtils.damp(position.y, targetPosition.y, 10, animation.delta);
@@ -129,7 +133,11 @@ class ClientPlayer extends Player {
 		const x = Math.round(position.x * 100) / 100;
 		const y = Math.round(position.y * 100) / 100;
 		const z = Math.round(position.z * 100) / 100;
-		posDom.innerText = `XYZ: ${x},${y},${z}`;
+
+		info.x = x;
+		info.y = y;
+		info.z = z;
+		folder.updateDisplay();
 		this.sendPosition();
 	}
 

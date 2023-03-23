@@ -44,7 +44,7 @@ class TerrainMessher {
 					(vertStart.z+vertEnd.z)/2+pos.z,
 				);
 
-				var color = new Color("0000AA");
+				var color = new Color(0x0000AA);
 				this.colors.push(color.r, color.g, color.b);
 			}
 		}

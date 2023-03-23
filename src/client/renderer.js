@@ -9,127 +9,119 @@ import {
 } from 'three';
 	
 class Renderer {
-    constructor(dom) {
-        this.clock = new Clock();
-        this.clock.localStartTime = Date.now();
-        this.fps = {
-            count: 0,
-            lastTick: this.clock.oldTime / 1000,
-        };
-        this.dom = dom;
-        this.fpsDom = document.createElement('p');
-        this.dom.info_entry.appendChild(this.fpsDom);
+	constructor({debugGui, viewport}) {
+		this.clock = new Clock();
+		this.clock.localStartTime = Date.now();
 
-        this.camera = new PerspectiveCamera(70, 1, 0.1, 1000);
-        this.renderer = new WebGLRenderer({
-            antialias: true,
-            stencil: false,
-            powerPreference: 'high-performance',
-        });
-        this.renderer.outputEncoding = sRGBEncoding;
-        this.renderer.toneMapping = ACESFilmicToneMapping;
-        // this.renderer.setPixelRatio(window.devicePixelRatio || 1);
-        this.renderer.setAnimationLoop(this.onAnimationTick.bind(this));
-        dom.renderer.appendChild(this.renderer.domElement);
-        
-        this.onFirstInteraction = this.onFirstInteraction.bind(this);
-        window.addEventListener('click', this.onFirstInteraction, false);
-        window.addEventListener('keydown', this.onFirstInteraction, false);
-        
-        window.addEventListener('resize', this.onResize.bind(this), false);
-        document.addEventListener('visibilitychange', this.onVisibilityChange.bind(this));
-        requestAnimationFrame(this.onResize.bind(this));
-    }
+		this.debugGui = debugGui;
+		// this.folder = this.debugGui.datGUI.addFolder('Rendering');
+		// this.info = {fps: 0};
+		// this.folder.add(this.info, 'fps');
 
-    onAnimationTick() {
-        const {
-            camera,
-            clock,
-            fpsDom,
-            fps,
-            listener,
-            renderer,
-            scene,
-        } = this;
+		this.viewport = viewport;
+		this.camera = new PerspectiveCamera(70, 1, 0.1, 1000);
+		this.renderer = new WebGLRenderer({
+			antialias: true,
+			stencil: false,
+			powerPreference: 'high-performance',
+		});
+		this.renderer.outputEncoding = sRGBEncoding;
+		this.renderer.toneMapping = ACESFilmicToneMapping;
+		// this.renderer.setPixelRatio(window.devicePixelRatio || 1);
+		this.renderer.setAnimationLoop(this.onAnimationTick.bind(this));
+		this.viewport.appendChild(this.renderer.domElement);
+		
+		this.onFirstInteraction = this.onFirstInteraction.bind(this);
+		window.addEventListener('click', this.onFirstInteraction, false);
+		window.addEventListener('keydown', this.onFirstInteraction, false);
+		
+		window.addEventListener('resize', this.onResize.bind(this), false);
+		document.addEventListener('visibilitychange', this.onVisibilityChange.bind(this));
+		requestAnimationFrame(this.onResize.bind(this));
+	}
 
-        const animation = {
-            delta: Math.min(clock.getDelta(), 1),
-            time: clock.oldTime / 1000,
-        };
+	onAnimationTick() {
+		const {
+			camera,
+			clock,
+			debugGui,
+			listener,
+			renderer,
+			scene,
+		} = this;
 
-        scene.onAnimationTick(animation);
-        if (listener) {
-            camera.matrixWorld.decompose(listener.position, listener.quaternion, listener.scale);
-            listener.updateMatrixWorld();
-        }
-        renderer.render(scene, camera);
+		const animation = {
+			delta: Math.min(clock.getDelta(), 1),
+			time: clock.oldTime / 1000,
+		};
 
-        fps.count += 1;
-        if (animation.time >= fps.lastTick + 1) {
-            renderer.fps = Math.round(fps.count / (animation.time - fps.lastTick));
-            fpsDom.innerText = `${renderer.fps}fps`;
-            fps.lastTick = animation.time;
-            fps.count = 0;
-        }
-    }
+		scene.onAnimationTick(animation);
+		if (listener) {
+			camera.matrixWorld.decompose(listener.position, listener.quaternion, listener.scale);
+			listener.updateMatrixWorld();
+		}
+		debugGui.stats.begin();
+		renderer.render(scene, camera);
+		debugGui.stats.end();
+	}
 
-    onFirstInteraction() {
-        const { scene } = this;
-        window.removeEventListener('click', this.onFirstInteraction);
-        window.removeEventListener('keydown', this.onFirstInteraction);
-        this.listener = new AudioListener();
-        scene.onFirstInteraction();
-    }
+	onFirstInteraction() {
+		const { scene } = this;
+		window.removeEventListener('click', this.onFirstInteraction);
+		window.removeEventListener('keydown', this.onFirstInteraction);
+		this.listener = new AudioListener();
+		scene.onFirstInteraction();
+	}
 
-    onResize() {
-        const {
-            camera,
-            dom,
-            renderer,
-            scene,
-        } = this;
+	onResize() {
+		const {
+			camera,
+			viewport,
+			renderer,
+			scene,
+		} = this;
 
-        const { width, height } = dom.renderer.getBoundingClientRect();
-        renderer.setSize(width, height);
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-        scene.onResize();
-    }
+		const { width, height } = viewport.getBoundingClientRect();
+		renderer.setSize(width, height);
+		camera.aspect = width / height;
+		camera.updateProjectionMatrix();
+		scene.onResize();
+	}
 
-    onVisibilityChange() {
-        const { clock, fps } = this;
-        const isVisible = document.visibilityState === 'visible';
-        if (isVisible) {
-            clock.start();
-            fps.count = -1;
-            fps.lastTick = (clock.oldTime / 1000);
-        }
-    }
+	onVisibilityChange() {
+		const { clock, fps } = this;
+		const isVisible = document.visibilityState === 'visible';
+		if (isVisible) {
+			clock.start();
+			fps.count = -1;
+			fps.lastTick = (clock.oldTime / 1000);
+		}
+	}
 
-    static patchFog() {
-        ShaderChunk.fog_pars_vertex = ShaderChunk.fog_pars_vertex.replace(
-            'varying float vFogDepth;',
-            'varying vec3 vFogPosition;'
-        );
+	static patchFog() {
+		ShaderChunk.fog_pars_vertex = ShaderChunk.fog_pars_vertex.replace(
+			'varying float vFogDepth;',
+			'varying vec3 vFogPosition;'
+		);
 
-        ShaderChunk.fog_vertex = ShaderChunk.fog_vertex.replace(
-            'vFogDepth = - mvPosition.z;',
-            'vFogPosition = - mvPosition.xyz;'
-        );
+		ShaderChunk.fog_vertex = ShaderChunk.fog_vertex.replace(
+			'vFogDepth = - mvPosition.z;',
+			'vFogPosition = - mvPosition.xyz;'
+		);
 
-        ShaderChunk.fog_pars_fragment = ShaderChunk.fog_pars_fragment.replace(
-            'varying float vFogDepth;',
-            'varying vec3 vFogPosition;'
-        );
+		ShaderChunk.fog_pars_fragment = ShaderChunk.fog_pars_fragment.replace(
+			'varying float vFogDepth;',
+			'varying vec3 vFogPosition;'
+		);
 
-        ShaderChunk.fog_fragment = ShaderChunk.fog_fragment.replace(
-            '#ifdef USE_FOG',
-            [
-                '#ifdef USE_FOG',
-                '  float vFogDepth = length(vFogPosition);',
-            ].join('\n')
-        );
-    }
+		ShaderChunk.fog_fragment = ShaderChunk.fog_fragment.replace(
+			'#ifdef USE_FOG',
+			[
+				'#ifdef USE_FOG',
+				'  float vFogDepth = length(vFogPosition);',
+			].join('\n')
+		);
+	}
 }
 
 export default Renderer;

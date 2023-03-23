@@ -10,14 +10,18 @@ import io from '../../node_modules/socket.io/client-dist/socket.io.js'
 import Renderer from './renderer';
 import ClientPlayer from './player';
 import ClientPlanet from './world/world'
+import DebugGui from './debug'
+
+
+var debugGui = new DebugGui();
 
 
 const chunkSize = 32;
 
 Renderer.patchFog();
 const renderer = new Renderer({
-	info_entry: document.getElementById('info'),
-	renderer: document.getElementById('app'),
+	debugGui: debugGui,
+	viewport: document.getElementById('app'),
 });
 
 
@@ -28,8 +32,8 @@ class Main extends Scene {
 		this.socket = io();
 		this.player = new ClientPlayer({
 			camera: renderer.camera,
-			renderer: renderer.dom.renderer,
-			dom: {info_entry: document.getElementById('info'),},
+			viewport: renderer.viewport,
+			debugGui: debugGui,
 			socket: this.socket,
 		});
 
