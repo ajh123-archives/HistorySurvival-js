@@ -93,8 +93,6 @@ class Renderer {
 		const isVisible = document.visibilityState === 'visible';
 		if (isVisible) {
 			clock.start();
-			fps.count = -1;
-			fps.lastTick = (clock.oldTime / 1000);
 		}
 	}
 

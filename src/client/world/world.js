@@ -18,14 +18,27 @@ class ClientPlanet extends Planet {
 		debugGui
 	}) {
 		super({size: 0});
+		this.mesh = null;
 		this.socket = socket;
-		this.mesher = new TerrainMessher({debugGui: debugGui});
-		socket.emit('loadTerrain');
-		socket.on('loadTerrain', (msg) => {
+		this.mesher = new TerrainMessher({debugGui: debugGui, world: this});
+		this.scene = scene;
+
+		this.socket.emit('loadTerrain', (msg) => {
 			this.deserialise(msg[0]);
 			this.buildMesh();
-			scene.add(this);
 		});
+		this.scene.add(this);
+	}
+
+	updateMesh() {
+		this.scene.remove(this);
+		this.remove(this.mesh);
+		this.mesh = null;
+		this.socket.emit('loadTerrain', (msg) => {
+			this.deserialise(msg[0]);
+			this.buildMesh();
+		});
+		this.scene.add(this);
 	}
 
 	buildMesh() {
@@ -43,11 +56,8 @@ class ClientPlanet extends Planet {
 				}	
 			}
 		}
-		console.log(center)
 
 		var geometry = new BufferGeometry();
-		console.log(this.mesher.vertices);
-		// geometry.setIndex(this.mesher.indecies);
 		geometry.setAttribute('position', new BufferAttribute(new Float32Array(this.mesher.vertices), 3));
 		geometry.setAttribute('color', new BufferAttribute(new Float32Array(this.mesher.colors), 3));
 		geometry.computeVertexNormals();
@@ -55,9 +65,9 @@ class ClientPlanet extends Planet {
 			side: DoubleSide,
 			vertexColors: true
 		});
-		var mesh = new Mesh(geometry, material);
-		mesh.position.set(0, 0, 0);
-		this.add(mesh);
+		this.mesh = new Mesh(geometry, material);
+		this.mesh.position.set(0, 0, 0);
+		this.add(this.mesh);
 	}
 }
 

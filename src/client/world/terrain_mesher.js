@@ -5,14 +5,16 @@ import {
 
 
 class TerrainMessher {
-	constructor({debugGui}) {
+	constructor({debugGui, world}) {
 		this.colors = [];
 		this.vertices = [];
-		// this.indecies = [];
+		this.world = world;
 		this.debugGui = debugGui;
 		this.folder = this.debugGui.datGUI.addFolder('Terrain');
-        this.info = {useInterpolation: false};
-        this.folder.add(this.info, 'useInterpolation');
+		this.info = {useInterpolation: true};
+		this.folder.add(this.info, 'useInterpolation').onFinishChange(() => {
+			this.world.updateMesh();
+		});
 	}
 
 	getCubeIndexAt(terrain, x, y, z) {
@@ -32,55 +34,75 @@ class TerrainMessher {
 		return d[0] + 2 * d[1] + 4 * d[2] + 8 * d[3] + 16 * d[4] + 32 * d[5] + 64 * d[6] + 128 * d[7];
 	}
 
-	sampleValue(pos, radius){
-		return pos.distanceTo(new Vector3(0, 0, 0)) - radius;
+	sampleValue(pos){
+		return pos.distanceTo(new Vector3(0, 0, 0)) - ((this.world.size / 2) / 1.5);
 	}
 
-	buildVertices(id, pos, radius) {	
-		for(var face = 0; face < 5; face++) {
-			var addedFace = false;
-			for(var tri = 0; tri < 3; tri++) {
-				var edgeCase = triangleTable[id][3 * face + tri];
-				if (edgeCase == -1) return;
-				addedFace = true;
+	buildVertices(id, pos) {
+		if (this.info.useInterpolation) { // Implemented from https://gist.github.com/ttammear/a3cdc214023f8c92b1f0bf27e7cc08d1
+			// construct case index from 8 corner samples
+			let caseIndex = 0;
+			for (let i = 0; i < 8; i++) {
+				const sample = this.sampleValue(pos.clone().add(cornerOffsets[i]));
+				if (sample >= 0.0) caseIndex |= 1 << i;
+			}
 
-				var vert1 = edgeVertexOffsets[edgeCase][0];
-				var vert2 = edgeVertexOffsets[edgeCase][1];
+			// early out if entirely inside or outside the volume
+			if (caseIndex === 0 || caseIndex === 0xFF) return;
 
-				if (this.info.useInterpolation) {
+			let caseVert = 0;
+			for (let i = 0; i < 5; i++) {
+				for (let tri = 0; tri < 3; tri++) {
+
+					const edgeCase = triangleTable[caseIndex][caseVert];
+					if (edgeCase === -1) return;
+					const vert1 = pos.clone().add(edgeVertexOffsets[edgeCase][0]); // beginning of the edge
+					const vert2 = pos.clone().add(edgeVertexOffsets[edgeCase][1]); // end of the edge
+			
+					
 					// interpolate along the edge
-					var s1 = this.sampleValue(vert1.clone(), radius);
-					var s2 = this.sampleValue(vert2.clone(), radius);
-					var dif = s1 - s2;
+					const s1 = this.sampleValue(pos.clone().add(edgeVertexOffsets[edgeCase][0].clone()));
+					const s2 = this.sampleValue(pos.clone().add(edgeVertexOffsets[edgeCase][1].clone()));
+					let dif = s1 - s2;
 					if (dif == 0.0) {
 						dif = 0.5;
 					} else {
 						dif = s1 / dif;
 					}
-					// console.log(s1, s2, dif)
 				
-					// Lerp
-					var stage1 = vert2.clone().sub(vert1.clone());
-					var stage2 = stage1.multiply(new Vector3(dif, dif, dif));
-					var vertPosInterpolated = vert1.clone().add(stage2);
+					// Lerp - vertPosInterpolated = vert1 + ((vert2 - vert1) * dif);
+					const vertPosInterpolated = vert1.clone().add(vert2.clone().sub(vert1.clone()).multiplyScalar(dif));
 
 					this.vertices.push(
-						(vertPosInterpolated.x)+pos.x,
-						(vertPosInterpolated.y)+pos.y,
-						(vertPosInterpolated.z)+pos.z,
+						(vertPosInterpolated.x) + this.world.position.x,
+						(vertPosInterpolated.y) + this.world.position.y,
+						(vertPosInterpolated.z) + this.world.position.z,
 					);
-					// this.indecies.push(this.vertices.length - 1);
-				} else {
+
+					const color = new Color(0x0000AA);
+					this.colors.push(color.r, color.g, color.b);
+
+					caseVert++;
+				}
+			}
+		} else {
+			for(var face = 0; face < 5; face++) {
+				for(var tri = 0; tri < 3; tri++) {
+					const edgeCase = triangleTable[id][3 * face + tri];
+					if (edgeCase == -1) return;
+
+					const vert1 = edgeVertexOffsets[edgeCase][0].clone();
+					const vert2 = edgeVertexOffsets[edgeCase][1].clone();
+
 					this.vertices.push(
 						(vert1.x+vert2.x)/2+pos.x,
 						(vert1.y+vert2.y)/2+pos.y,
 						(vert1.z+vert2.z)/2+pos.z,
 					);
-					// this.indecies.push(this.vertices.length - 1);
-				}
 
-				var color = new Color(0x0000AA);
-				this.colors.push(color.r, color.g, color.b);
+					const color = new Color(0x0000AA);
+					this.colors.push(color.r, color.g, color.b);
+				}
 			}
 		}
 		return;

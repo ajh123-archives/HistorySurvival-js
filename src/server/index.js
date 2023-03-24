@@ -30,8 +30,8 @@ io.on('connection', (socket) => {
 	var player = new Player({socket});
 	player.position.set(0, (planet.size/2)-((planet.size/4)-10), 0);
 	player.sendPosition();
-	socket.on('loadTerrain', () => {
-		socket.emit('loadTerrain', [planet.serialise()]);
+	socket.on('loadTerrain', (callback) => {
+		callback([planet.serialise()]);
 	});
 	socket.on('disconnect', () => {
 		console.log('user disconnected');
