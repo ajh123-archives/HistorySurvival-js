@@ -5,10 +5,14 @@ import {
 
 
 class TerrainMessher {
-	constructor() {
+	constructor({debugGui}) {
 		this.colors = [];
 		this.vertices = [];
-		this.indecies = [];
+		// this.indecies = [];
+		this.debugGui = debugGui;
+		this.folder = this.debugGui.datGUI.addFolder('Terrain');
+        this.info = {useInterpolation: false};
+        this.folder.add(this.info, 'useInterpolation');
 	}
 
 	getCubeIndexAt(terrain, x, y, z) {
@@ -43,27 +47,37 @@ class TerrainMessher {
 				var vert1 = edgeVertexOffsets[edgeCase][0];
 				var vert2 = edgeVertexOffsets[edgeCase][1];
 
+				if (this.info.useInterpolation) {
+					// interpolate along the edge
+					var s1 = this.sampleValue(vert1.clone(), radius);
+					var s2 = this.sampleValue(vert2.clone(), radius);
+					var dif = s1 - s2;
+					if (dif == 0.0) {
+						dif = 0.5;
+					} else {
+						dif = s1 / dif;
+					}
+					// console.log(s1, s2, dif)
+				
+					// Lerp
+					var stage1 = vert2.clone().sub(vert1.clone());
+					var stage2 = stage1.multiply(new Vector3(dif, dif, dif));
+					var vertPosInterpolated = vert1.clone().add(stage2);
 
-                // interpolate along the edge
-                var s1 = this.sampleValue(edgeVertexOffsets[edgeCase][0], radius);
-                var s2 = this.sampleValue(edgeVertexOffsets[edgeCase][1], radius);
-                var dif = s1 - s2;
-                if (dif == 0.0) {
-                    dif = 0.5;
+					this.vertices.push(
+						(vertPosInterpolated.x)+pos.x,
+						(vertPosInterpolated.y)+pos.y,
+						(vertPosInterpolated.z)+pos.z,
+					);
+					// this.indecies.push(this.vertices.length - 1);
 				} else {
-                    dif = s1 / dif;
+					this.vertices.push(
+						(vert1.x+vert2.x)/2+pos.x,
+						(vert1.y+vert2.y)/2+pos.y,
+						(vert1.z+vert2.z)/2+pos.z,
+					);
+					// this.indecies.push(this.vertices.length - 1);
 				}
-                // Lerp
-				var stage1 = vert2.clone().sub(vert1.clone());
-				var stage2 = stage1.multiplyScalar(dif);
-                var vertPosInterpolated = vert1.clone().add(stage2);
-
-				this.vertices.push(
-					(vertPosInterpolated.x)+pos.x,
-					(vertPosInterpolated.y)+pos.y,
-					(vertPosInterpolated.z)+pos.z,
-				);
-				this.indecies.push(this.vertices.length - 1);
 
 				var color = new Color(0x0000AA);
 				this.colors.push(color.r, color.g, color.b);

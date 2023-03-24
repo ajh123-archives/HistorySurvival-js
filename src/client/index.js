@@ -55,6 +55,7 @@ class Main extends Scene {
 		this.world = new ClientPlanet({
 			socket: this.socket,
 			scene: this,
+			debugGui: debugGui,
 		});
 	}
 

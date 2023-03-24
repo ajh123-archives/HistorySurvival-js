@@ -15,10 +15,11 @@ class ClientPlanet extends Planet {
 	constructor({
 		socket,
 		scene,
+		debugGui
 	}) {
 		super({size: 0});
 		this.socket = socket;
-		this.mesher = new TerrainMessher();
+		this.mesher = new TerrainMessher({debugGui: debugGui});
 		socket.emit('loadTerrain');
 		socket.on('loadTerrain', (msg) => {
 			this.deserialise(msg[0]);
@@ -37,14 +38,16 @@ class ClientPlanet extends Planet {
 			for(let y = 0; y < this.size - 1; y++) {
 				for(let z = 0; z < this.size - 1; z++) {
 					let marchingIdx = this.mesher.getCubeIndexAt(this.terrain, x, y, z);
-					this.mesher.buildVertices(marchingIdx, center, this.size);
+					let pos = new Vector3(x - center.x, y - center.y, z - center.z);
+					this.mesher.buildVertices(marchingIdx, pos);
 				}	
-			}				
+			}
 		}
+		console.log(center)
 
 		var geometry = new BufferGeometry();
 		console.log(this.mesher.vertices);
-		geometry.setIndex(this.mesher.indecies);
+		// geometry.setIndex(this.mesher.indecies);
 		geometry.setAttribute('position', new BufferAttribute(new Float32Array(this.mesher.vertices), 3));
 		geometry.setAttribute('color', new BufferAttribute(new Float32Array(this.mesher.colors), 3));
 		geometry.computeVertexNormals();

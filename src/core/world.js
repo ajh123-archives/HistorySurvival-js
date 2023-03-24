@@ -27,7 +27,7 @@ class Planet extends Group {
 	}
 
 	getCenter() {
-		return new Vector3(this.size / 2, this.size / 2, this.size / 2).add(this.position);
+		return new Vector3(this.size / 2, this.size / 2, this.size / 2);
 	}
 
 	serialise() {
