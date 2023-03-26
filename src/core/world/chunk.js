@@ -1,6 +1,5 @@
 class Chunk {
 	constructor({chunkSize}) {
-		super();
 		this.chunkSize = chunkSize; // the size of each chunk in voxels
 		this.data = [];
 	}
