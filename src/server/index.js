@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import { Server } from 'socket.io';
 
 import Player from '../core/player';
-import Planet from '../core/world'
+import Planet from '../core/world/world'
 
 
 const app = express();

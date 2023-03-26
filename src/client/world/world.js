@@ -1,4 +1,4 @@
-import Planet from '../../core/world';
+import Planet from '../../core/world/world';
 import TerrainMessher from './terrain_mesher';
 
 
