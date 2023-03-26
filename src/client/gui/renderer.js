@@ -6,6 +6,8 @@ import {
 	ShaderChunk,
 	sRGBEncoding,
 	WebGLRenderer,
+	Frustum,
+	Matrix4,
 } from 'three';
 	
 class Renderer {
@@ -89,11 +91,25 @@ class Renderer {
 	}
 
 	onVisibilityChange() {
-		const { clock, fps } = this;
+		const { clock } = this;
 		const isVisible = document.visibilityState === 'visible';
 		if (isVisible) {
 			clock.start();
 		}
+	}
+
+	getFrustum() {
+		const frustum = new Frustum();
+		const cameraViewProjectionMatrix = new Matrix4();
+		
+		// Update frustum with current camera settings
+		this.camera.updateMatrixWorld();
+		cameraViewProjectionMatrix.multiplyMatrices(
+			this.camera.projectionMatrix,
+			this.camera.matrixWorldInverse
+		);
+		frustum.setFromProjectionMatrix(cameraViewProjectionMatrix);
+		return frustum;
 	}
 
 	static patchFog() {

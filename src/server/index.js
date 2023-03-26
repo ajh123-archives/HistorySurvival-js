@@ -11,7 +11,7 @@ import Planet from '../core/world'
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
-const planet = new Planet({size: 100});
+const planet = new Planet({chunkSize: 16, numChunks: 4});
 planet.generate();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -28,7 +28,7 @@ app.get('/*', (req, res) => {
 io.on('connection', (socket) => {
 	console.log('a user connected');
 	var player = new Player({socket});
-	player.position.set(0, (planet.size/2)-((planet.size/4)-10), 0);
+	player.position.set(0, (planet.chunkSize*planet.numChunks), 0);
 	player.sendPosition();
 	socket.on('loadTerrain', (callback) => {
 		callback([planet.serialise()]);

@@ -3,6 +3,7 @@ import {
 	SpotLight, 
 	Color,
 	PMREMGenerator,
+	AmbientLight,
 } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import io from '../../node_modules/socket.io/client-dist/socket.io.js'
@@ -26,7 +27,7 @@ const renderer = new Renderer({
 
 
 class Main extends Scene {
-	constructor() {
+	constructor({renderer}) {
 		super();
 
 		this.socket = io();
@@ -51,11 +52,14 @@ class Main extends Scene {
 		light.add(light.target);
 		this.player.camera.add(light);
 
+		var ambientLight = new AmbientLight(0x404040);
+		this.add(ambientLight);
 
 		this.world = new ClientPlanet({
 			socket: this.socket,
 			scene: this,
 			debugGui: debugGui,
+			renderer: renderer,
 		});
 	}
 
@@ -63,10 +67,11 @@ class Main extends Scene {
 		const {player, world } = this;
 		player.onAnimationTick(animation);
 		// world.world.updateChunks(player.position);
+		world.renderChunks();
 	};
 
 	onResize() {}
 	onFirstInteraction() {}
 }
 
-renderer.scene = new Main();
+renderer.scene = new Main({renderer: renderer});
