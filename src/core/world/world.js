@@ -40,11 +40,10 @@ class Planet extends Group {
 	serialise() {
 		var newData = []
 		for (var x = 0; x < this.numChunks; x++) {
+			newData[x] = [];
 			for (var y = 0; y < this.numChunks; y++) {
+				newData[x][y] = [];
 				for (var z = 0; z < this.numChunks; z++) {
-					console.log(x, y, z);
-					newData[x] = [];
-					newData[x][y] = [];
 					newData[x][y][z] = this.terrain[x][y][z].serialise();
 				}
 			}
@@ -63,18 +62,20 @@ class Planet extends Group {
 		this.chunkSize = planet.chunkSize;
 		this.numChunks = planet.numChunks;
 
-		var newData = [];
+		this.terrain = [];
 		for (var x = 0; x < this.numChunks; x++) {
+			this.terrain[x] = [];
 			for (var y = 0; y < this.numChunks; y++) {
+				this.terrain[x][y] = [];
 				for (var z = 0; z < this.numChunks; z++) {
-					console.log(x, y, z);
-					newData[x] = [];
-					newData[x][y] = [];
-					newData[x][y][z] = new Chunk({chunkPos: new Vector3(x, y, z), chunkSize: planet.chunkSize}).deserialise(planet.terrain[x][y][z]);
+					this.terrain[x][y][z] = new Chunk({
+						chunkPos: new Vector3(x, y, z), 
+						chunkSize: planet.chunkSize
+					});
+					this.terrain[x][y][z].deserialise(planet.terrain[x][y][z]);
 				}
 			}
 		}
-		this.terrain = newData;
 	}
 }
 

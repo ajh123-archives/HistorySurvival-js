@@ -37,7 +37,7 @@ class ChunkMesher {
 					for (let cx = 0; cx < this.world.chunkSize; cx++) {
 						for (let cy = 0; cy < this.world.chunkSize; cy++) {
 							for (let cz = 0; cz < this.world.chunkSize; cz++) {
-								console.log(this.world.terrain[x][y][z]);
+								// console.log(this.world.terrain[x][y][z]);
 								if (this.world.terrain[x][y][z] !== undefined) {
 									const voxelValue = this.world.terrain[x][y][z].getVoxel(cx, cy, cz);
 									if (voxelValue !== undefined) {
