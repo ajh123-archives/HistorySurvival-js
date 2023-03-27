@@ -93,32 +93,42 @@ class ChunkMesher {
 		this.meshedChunks.push(chunk);
 	}
 
-	renderChunks() {
+	async renderChunks() {
+		var promises = [];
 		for (let i = 0; i < this.chunkQueue.length; i++) {
-			const chunk = this.chunkQueue.pop();
-			this.buildChunkVertices(chunk);
+			const build = new Promise((resolve) => {
+				const chunk = this.chunkQueue.pop();
+				this.buildChunkVertices(chunk);
+				resolve();
+			});
+			promises.push(build);
 		}
+		await Promise.all(promises);
 
-		var chunks = [];
+		const build = new Promise((resolve) => {
+			var chunks = [];
 
-		for (let i = 0; i < this.meshedChunks.length; i++) {
-			const chunk = this.meshedChunks[i];
-			this.world.remove(chunk.userData.object);
-			chunks.push(chunk);
-		}
+			for (let i = 0; i < this.meshedChunks.length; i++) {
+				const chunk = this.meshedChunks[i];
+				this.world.remove(chunk.userData.object);
+				chunks.push(chunk);
+			}
 
-		// Sort chunks by distance to camera
-		chunks.sort((a, b) => {
-			const distanceA = this.getDistanceToCamera(a);
-			const distanceB = this.getDistanceToCamera(b);
-			return distanceB - distanceA;
+			// Sort chunks by distance to camera
+			chunks.sort((a, b) => {
+				const distanceA = this.getDistanceToCamera(a);
+				const distanceB = this.getDistanceToCamera(b);
+				return distanceB - distanceA;
+			});
+
+			// Render chunks from front to back
+			for (let i = 0; i < chunks.length; i++) {
+				const chunk = chunks[i];
+				this.world.add(chunk.userData.object);
+			}
+			resolve();
 		});
-
-		// Render chunks from front to back
-		for (let i = 0; i < chunks.length; i++) {
-			const chunk = chunks[i];
-			this.world.add(chunk.userData.object);
-		}
+		await Promise.all([build]);
 	}
 
 	// Calculate distance between chunk mesh and camera
