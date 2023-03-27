@@ -17,7 +17,13 @@ class ClientPlanet extends Planet {
 
 		this.socket.emit('loadTerrain', (msg) => {
 			this.deserialise(msg[0]);
-			this.buildMesh();
+			for (var x = 0; x < this.numChunks; x++) {
+				for (var y = 0; y < this.numChunks; y++) {
+					for (var z = 0; z < this.numChunks; z++) {
+						this.addChunk(this.terrain[x][y][z]);
+					}
+				}
+			}
 		});
 		this.scene.add(this);
 	}
@@ -39,6 +45,10 @@ class ClientPlanet extends Planet {
 
 	renderChunks() {
 		this.mesher.renderChunks();
+	}
+
+	addChunk(chunk) {
+		this.mesher.chunkQueue.push(chunk);
 	}
 }
 

@@ -3,6 +3,7 @@ class Chunk {
 		this.chunkSize = chunkSize; // the size of each chunk in voxels
 		this.chunkPos = chunkPos;
 		this.data = [];
+		this.userData = {};
 	}
 
 	setVoxel(cx, cy, cz, voxel) {
