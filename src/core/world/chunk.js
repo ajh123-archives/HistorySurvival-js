@@ -1,6 +1,7 @@
 class Chunk {
-	constructor({chunkSize}) {
+	constructor({chunkPos, chunkSize}) {
 		this.chunkSize = chunkSize; // the size of each chunk in voxels
+		this.chunkPos = chunkPos;
 		this.data = [];
 	}
 
@@ -30,6 +31,20 @@ class Chunk {
 			return undefined;
 		}
 		return this.data[cx][cy][cz];
+	}
+
+	serialise() {
+		return {
+			chunkPos: {x: this.chunkPos.x, y: this.chunkPos.y, z: this.chunkPos.z},
+			chunkSize: this.chunkSize,
+			data: this.data,
+		}
+	}
+
+	deserialise(chunk) {
+		this.chunkPos.set(chunk.chunkPos.x, chunk.chunkPos.y, chunk.chunkPos.z);
+		this.chunkSize = chunk.chunkSize;
+		this.data = chunk.data;
 	}
 }
 

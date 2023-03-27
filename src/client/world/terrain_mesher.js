@@ -37,28 +37,31 @@ class ChunkMesher {
 					for (let cx = 0; cx < this.world.chunkSize; cx++) {
 						for (let cy = 0; cy < this.world.chunkSize; cy++) {
 							for (let cz = 0; cz < this.world.chunkSize; cz++) {
-								const voxelValue = this.world.terrain[x][y][z][cx][cy][cz];
-								if (voxelValue !== undefined) {
-									const color = new Color(voxelValue.color);
-									const voxelGeometry = new BoxGeometry(1, 1, 1);
-									voxelGeometry.translate(cx, cy, cz);
-									const voxelPosition = voxelGeometry.attributes.position.array;
-									const voxelNormal = voxelGeometry.attributes.normal.array;
-									const voxelIndex = voxelGeometry.index.array;
-									for (let i = 0; i < voxelPosition.length; i++) {
-										positions.push(voxelPosition[i]);
+								console.log(this.world.terrain[x][y][z]);
+								if (this.world.terrain[x][y][z] !== undefined) {
+									const voxelValue = this.world.terrain[x][y][z].getVoxel(cx, cy, cz);
+									if (voxelValue !== undefined) {
+										const color = new Color(voxelValue.color);
+										const voxelGeometry = new BoxGeometry(1, 1, 1);
+										voxelGeometry.translate(cx, cy, cz);
+										const voxelPosition = voxelGeometry.attributes.position.array;
+										const voxelNormal = voxelGeometry.attributes.normal.array;
+										const voxelIndex = voxelGeometry.index.array;
+										for (let i = 0; i < voxelPosition.length; i++) {
+											positions.push(voxelPosition[i]);
+										}
+										for (let i = 0; i < voxelNormal.length; i++) {
+											normals.push(voxelNormal[i]);
+										}
+										for (let i = 0; i < voxelIndex.length; i++) {
+											indices.push(voxelIndex[i] + index);
+										}
+										// Add a color for each voxel
+										for (let i = 0; i < 24; i++) {
+											colors.push(color.r, color.g, color.b);
+										}
+										index += voxelPosition.length / 3;
 									}
-									for (let i = 0; i < voxelNormal.length; i++) {
-										normals.push(voxelNormal[i]);
-									}
-									for (let i = 0; i < voxelIndex.length; i++) {
-										indices.push(voxelIndex[i] + index);
-									}
-									// Add a color for each voxel
-									for (let i = 0; i < 24; i++) {
-										colors.push(color.r, color.g, color.b);
-									}
-									index += voxelPosition.length / 3;
 								}
 							}
 						}
