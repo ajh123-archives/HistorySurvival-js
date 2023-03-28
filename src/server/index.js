@@ -11,7 +11,7 @@ import Planet from '../core/world/world'
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
-const planet = new Planet({chunkSize: 16, numChunks: 4});
+const planet = new Planet({chunkSize: 30, numChunks: 1});
 planet.generate();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

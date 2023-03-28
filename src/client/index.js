@@ -46,7 +46,7 @@ class Main extends Scene {
 		this.environment = (new PMREMGenerator(renderer.renderer)).fromScene(new RoomEnvironment(), 0.04).texture;
 
 
-		this.background = new Color(0x0A1A2A);
+		this.background = new Color(0x3a3a3a);
 		const light = new SpotLight(0xFFFFFF, 5, 200, Math.PI / 3, 1);
 		light.target.position.set(0, 0, -1);
 		light.add(light.target);
@@ -64,10 +64,10 @@ class Main extends Scene {
 	}
 
 	onAnimationTick(animation) {
-		const {player, world } = this;
+		const {player} = this;
 		player.onAnimationTick(animation);
 		// world.world.updateChunks(player.position);
-		world.renderChunks();
+		// world.renderChunks();
 	};
 
 	onResize() {}

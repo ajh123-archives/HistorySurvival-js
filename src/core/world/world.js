@@ -3,6 +3,7 @@ import {
 } from 'three';
 
 import Chunk from './chunk';
+import Voxel from './voxel'
 
 
 class Planet extends Group {
@@ -25,10 +26,10 @@ class Planet extends Group {
 					for (var cx = 0; cx < this.chunkSize; cx++) {
 						for (var cy = 0; cy < this.chunkSize; cy++) {
 							for (var cz = 0; cz < this.chunkSize; cz++) {
-								var voxel = {
-									color: 0x00ff00
-								}
-								chunk.setVoxel(cx, cy, cz, voxel); // add the voxel to the chunk
+								chunk.setVoxel(cx, cy, cz, new Voxel({
+									color: 0x00ff00,
+									amount: 1
+								})); // add the voxel to the chunk
 							}
 						}
 					}

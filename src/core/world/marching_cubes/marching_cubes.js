@@ -1,17 +1,18 @@
 import {
-	BufferAttribute
+	// BufferAttribute,
+	Float32BufferAttribute,
+	// Color,
 } from 'three';
 import {triangulationTable, edgeTable} from './variables'
 
 
 class MarchingCubes {
-	constructor(xMax, yMax, zMax, sampleSize = 1) {
-		this.xMax = xMax;
-		this.yMax = yMax;
-		this.zMax = zMax;
+	constructor(chunk, sampleSize = 1) {
 		this.sampleSize = sampleSize;
+		this.chunk = chunk;
 
-		this.vertices = new Float32Array(this.xMax * this.yMax * this.zMax * 8 * 12 * 3);
+		this.vertices = [];
+		this.colors = [];
 
 		this.edges = [];
 		for (let i = 0; i < 12; i++) {
@@ -19,30 +20,38 @@ class MarchingCubes {
 		}
 	}
 
-	generateMesh(geometry, surfaceLevel, terrain) {
-		let fI, fJ, fK;
+	generateMesh(geometry, surfaceLevel, chunk) {
 		let x, y, z;
 
 		let vIdx = 0;
 
-		for (let i = -this.xMax; i < this.xMax; i++) {
-			fI = i + this.xMax;
+		for (let i = 0; i < this.chunk.chunkSize; i++) {
 			x = i * this.sampleSize;
-			for (let j = -this.yMax+1; j < this.yMax-1; j++) {
-				fJ = j + this.yMax;
+			for (let j = 0; j < this.chunk.chunkSize; j++) {
 				y = j * this.sampleSize;
-				for (let k = -this.zMax; k < this.zMax; k++) {
-					fK = k + this.zMax;
+				for (let k = 0; k < this.chunk.chunkSize; k++) {
 					z = k * this.sampleSize;
 
-					const v0 = terrain.getField(fI, fJ, fK);
-					const v1 = terrain.getField(fI + 1, fJ, fK);
-					const v2 = terrain.getField(fI + 1, fJ, fK + 1);
-					const v3 = terrain.getField(fI, fJ, fK + 1);
-					const v4 = terrain.getField(fI, fJ + 1, fK);
-					const v5 = terrain.getField(fI + 1, fJ + 1, fK);
-					const v6 = terrain.getField(fI + 1, fJ + 1, fK + 1);
-					const v7 = terrain.getField(fI, fJ + 1, fK + 1)
+					const v0 = chunk.getVoxel(i, j, k);
+					const v1 = chunk.getVoxel(i + 1, j, k);
+					const v2 = chunk.getVoxel(i + 1, j, k + 1);
+					const v3 = chunk.getVoxel(i, j, k + 1);
+					const v4 = chunk.getVoxel(i, j + 1, k);
+					const v5 = chunk.getVoxel(i + 1, j + 1, k);
+					const v6 = chunk.getVoxel(i + 1, j + 1, k + 1);
+					const v7 = chunk.getVoxel(i, j + 1, k + 1)
+
+					// console.log(v0, i, j, k);
+					// console.log(v1, i + 1, j, k);
+					// console.log(v2, i + 1, j, k + 1);
+					// console.log(v3, i, j, k + 1);
+					// console.log(v4, i, j + 1, k);
+					// console.log(v5, i + 1, j + 1, k);
+					// console.log(v6, i + 1, j + 1, k + 1);
+					// console.log(v7, i, j + 1, k + 1);
+					// console.log("----");
+
+					// var color = new Color(v0.color);
 
 					let cubeIndex = this.#getCubeIndex(surfaceLevel, v0, v1, v2, v3, v4, v5, v6, v7);
 					let edgeIndex = edgeTable[cubeIndex];
@@ -105,9 +114,11 @@ class MarchingCubes {
 							break;
 						}
 						const e = this.edges[triLen[i]];
-						this.vertices[vIdx] = e[0];
-						this.vertices[vIdx + 1] = e[1];
-						this.vertices[vIdx + 2] = e[2];
+						this.vertices.push(e[0], e[1], e[2]);
+						// Add a color for each voxel
+						// for (let i = 0; i < 24; i++) {
+						// 	this.colors.push(color.r, color.g, color.b);
+						// }
 						// indices[idxCounter] = idxCounter;
 						// idxCounter++;
 						vIdx += 3;
@@ -116,7 +127,9 @@ class MarchingCubes {
 			}
 		}
 
-		geometry.setAttribute('position', new BufferAttribute(this.vertices.slice(0, vIdx), 3));
+		console.log(this.vertices);
+		geometry.setAttribute('position', new Float32BufferAttribute(this.vertices, 3));
+		// geometry.setAttribute('color', new Float32BufferAttribute(this.colors, 3));
 		geometry.computeVertexNormals();
 
 		// tell three.js that mesh has been updated
