@@ -26,9 +26,21 @@ class Planet extends Group {
 					for (var cx = 0; cx < this.chunkSize; cx++) {
 						for (var cy = 0; cy < this.chunkSize; cy++) {
 							for (var cz = 0; cz < this.chunkSize; cz++) {
+								var amount = -1;
+								if (cx == 0 && cx == this.chunkSize) {
+									amount = 1;
+									console.log("t")
+								} else if (cy == 0 && cy == this.chunkSize) {
+									amount = 1;
+									console.log("t")
+								} else if (cz == 0 && cz == this.chunkSize) {
+									amount = 1;
+									console.log("t")
+								}
+								
 								chunk.setVoxel(cx, cy, cz, new Voxel({
 									color: 0x00ff00,
-									amount: 1
+									amount: amount
 								})); // add the voxel to the chunk
 							}
 						}

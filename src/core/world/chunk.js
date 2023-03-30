@@ -2,6 +2,7 @@ import {
 	BufferGeometry,
 	MeshStandardMaterial,
 	Mesh,
+	Color,
 } from 'three';
 import MarchingCubes from './marching_cubes/marching_cubes';
 import Voxel from './voxel'
@@ -14,8 +15,6 @@ class Chunk {
 		this.data = [];
 		this.userData = {};
 
-		var sampleSize = 1;
-
 		this.geometry = new BufferGeometry();
 		this.material = new MeshStandardMaterial({color: 0xFFFFFF});
 		this.mesh = new Mesh(this.geometry, this.material);
@@ -24,7 +23,7 @@ class Chunk {
 			chunkPos.y, 
 			chunkPos.z
 		);
-		this.marchingCubes = new MarchingCubes(this, sampleSize);
+		this.marchingCubes = new MarchingCubes(chunkSize, chunkSize, chunkSize, this);
 	}
 
 	setVoxel(cx, cy, cz, voxel) {
@@ -39,6 +38,9 @@ class Chunk {
 			this.data[cx][cy] = [];
 		}
 		this.data[cx][cy][cz] = voxel;
+		this.marchingCubes.set(cx, cy, cz, voxel.amount);
+		var color = new Color(voxel.color);
+		this.marchingCubes.setColor(cx, cy, cz, color.r, color.g, color.b);
 	}
 
 	getVoxel(cx, cy, cz) {
@@ -84,10 +86,10 @@ class Chunk {
 			for (var y = 0; y < this.chunkSize; y++) {
 				this.data[x][y] = [];
 				for (var z = 0; z < this.chunkSize; z++) {
-					this.data[x][y][z] = new Voxel({
+					this.setVoxel(x, y, z, new Voxel({
 						color: chunk.data[x][y][z].color, 
 						amount: chunk.data[x][y][z].amount
-					});
+					}));
 					this.data[x][y][z].deserialise(chunk.data[x][y][z]);
 				}
 			}
@@ -95,7 +97,7 @@ class Chunk {
 	}
 
 	buildMesh() {
-		this.marchingCubes.generateMesh(this.geometry, 0, this);
+		this.marchingCubes.setMesh(this.geometry, 0);
 	}
 }
 
