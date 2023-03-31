@@ -16,7 +16,7 @@ class Chunk {
 		this.userData = {};
 
 		this.geometry = new BufferGeometry();
-		this.material = new MeshStandardMaterial({color: 0xFFFFFF});
+		this.material = new MeshStandardMaterial({vertexColors: true});
 		this.mesh = new Mesh(this.geometry, this.material);
 		this.mesh.position.set(
 			chunkPos.x, 
@@ -24,6 +24,7 @@ class Chunk {
 			chunkPos.z
 		);
 		this.marchingCubes = new MarchingCubes(chunkSize, chunkSize, chunkSize, this);
+		console.log(this.mesh.position);
 	}
 
 	setVoxel(cx, cy, cz, voxel) {
